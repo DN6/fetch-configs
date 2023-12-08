@@ -129,23 +129,22 @@ def fetch_model_configs(model, cache):
         logger.info(f"Unknown UNet class {class_name}")
         return
 
-    with init_empty_weights():
-        try:
-            unet = unet_cls.from_config(config_path)
-            unet.config_name = "config_updated.json"
-            unet.save_config(save_directory=save_directory)
+    try:
+        config = unet_cls.load_config(config_path)
+        config.config_name = "config_updated.json"
+        config.save_config(save_directory=save_directory)
 
-            with open(f"{save_directory}/config_updated.json", "r") as fp:
-                config_updated = json.load(fp)
+        with open(f"{save_directory}/config_updated.json", "r") as fp:
+            config_updated = json.load(fp)
 
-            # hash the config to check how many configs are unique
-            config_hash = sha256(str(json.dumps(config_updated)).encode()).hexdigest()
-            del config_updated
-            metadata.update({"class_name": class_name, "config_hash": config_hash})
+        # hash the config to check how many configs are unique
+        config_hash = sha256(str(json.dumps(config_updated)).encode()).hexdigest()
+        del config_updated
+        metadata.update({"class_name": class_name, "config_hash": config_hash})
 
-        except Exception as e:
-            logger.error(f"Could not load UNet for {model_id}")
-            return
+    except Exception as e:
+        logger.error(f"Could not load UNet for {model_id}")
+        return
 
     with open(f"{save_path}/{MODEL_COMPONENT}/metadata.json", "w") as fp:
         json.dump(metadata, fp)
