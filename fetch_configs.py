@@ -45,7 +45,6 @@ logger.setLevel(logging.INFO)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--cache", type=str, default=None)
-parser.add_argument("--model_component", type=str, default="UNet")
 parser.add_argument("--save_path", type=str, default="configs")
 
 args = parser.parse_args()
